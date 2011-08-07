@@ -1,20 +1,23 @@
+var curButtonTop = 8;
 var domBackup = "";
-var xpath = "//*";
+var xpath = "//a";
 
-ctoolsCreateButton(8, 8, "3d page view", 'ctoolsShow3d()');
-ctoolsCreateButton(32, 8, "original", 'ctoolsShowOriginal()');
-ctoolsCreateButton(56, 8, "run xpath", 'ctoolsRunXPath()');
-ctoolsCreateButton(56+32, 8, "remove xpath", 'ctoolsRemove()');
-ctoolsShow3d();
+//ctoolsCreateButton("ctOptions", "Options", 'ctoolsShowOptions()');
+ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
+ctoolsCreateButton("ctRunXpath", "run xpath", 'ctoolsRunXPath()');
+ctoolsCreateButton("ctRemoveXpath", "remove xpath", 'ctoolsRemove()');
+//ctoolsShow3d();
 
-function ctoolsCreateButton(top, right, caption, func) {
+function ctoolsCreateButton(id, caption, func) {
   // Create the button
 	var elem = document.createElement("div");
 	elem.id = 'ctTestButton';
 	elem.setAttribute('class', 'ct_button');
 	elem.setAttribute('onclick',func);
-	elem.style.top = top + "px";
-	elem.style.right = right + "px";
+	elem.style.top = curButtonTop + "px";
+	curButtonTop += 32;
+	elem.id = id;
+	elem.style.right = "8px";
 	elem.style.height = "16px";
 	elem.style.width = "128px";
 	elem.style.padding = "4px";
@@ -26,8 +29,27 @@ function ctoolsCreateButton(top, right, caption, func) {
 	document.body.appendChild(elem);
 }
 
+// function ctoolsShowOptions() {
+//   var elem = document.createElement("div");
+//   elem.id = "ctOptionsWindow";
+//   elem.style.top = "8px";
+//   elem.style.left = "8px";
+//  elem.style.height = "320px";
+//  elem.style.width = "320px";
+//   elem.style.position = "fixed";
+//   elem.style.zIndex = "999999";
+//   elem.style.backgroundColor = "gray";
+//   elem.style.border = "1px solid black";
+//   document.body.appendChild(elem);
+// }
+
 function ctoolsShowOriginal() {
+  // Restore the original page content
   document.getElementsByTagName("html")[0].innerHTML = domBackup;
+
+  // Toggle view button state (After DOM refresh or changes won't take)
+  document.getElementById("ctView").innerHTML = "Normal View";
+  document.getElementById("ctView").setAttribute("onclick", "ctoolsShow3d()");
 }
 
 function ctoolsRemove() {
@@ -51,9 +73,13 @@ function ctoolsRunXPath() {
 }
 
 function ctoolsShow3d() {
+  // Toggle view button state
+  document.getElementById("ctView").innerHTML = "3D View";
+  document.getElementById("ctView").setAttribute("onclick", "ctoolsShowOriginal()");
+
   domBackup = document.getElementsByTagName("html")[0].innerHTML;
   
-  elems = document.body.getElementsByTagName("*");
+  elems = document.body.getElementsByTagName("div");
   document.body.style.background = "rgb(0,0,0)";
   var maxlvl = 0.0;
   for (elem in elems) {
@@ -86,6 +112,10 @@ function ctoolsShow3d() {
       elm.style.webkitTransform = "translate(" + (lvl) + "px, " + (lvl) + "px)";
       elm.style.webkitTransform += " scale(" + ((maxlvl-lvl) * sizeScale + 0.9) + ")";
       elm.setAttribute("src", "");
+      elm.addEventListener("click", function (e) {
+      	this.style.backgroundColor = '#0000ff';
+      	e.stopPropagation();
+      }, false);
       //elems[elem].style.border = "1px solid white";
       //elems[elem].style.zIndex = maxlvl - lvl;
       //elems[elem].style.position = "relative";

@@ -1,57 +1,49 @@
 <html>
 <head>
-
 <script type="text/javascript">
-var myRegexArray = new Array();
+var ctOptions = new Array();
 window.addEventListener("load", loadOptions, false);
 
+function clear_LocalStorage(){
+	localStorage.clear();
+	ctOptions = [];
+	var displayLocation = document.getElementById('mdevDisplayedRegex');
+	displayLocation.innerHTML = '<span>No Saved RegExs.</span>';
+}
+
 function saveOptions(){
-write_localStorage();
-loadOptions();
-document.getElementById('newRegex').value = '';
+  write_localStorage();
+  loadOptions();
+  document.getElementById('ctInput').value = '';
 }
 
 function loadOptions(){
-read_LocalStorage();
-display_LocalStorage();
+  read_LocalStorage();
+  display_LocalStorage();
 }
 
-// Saves options to localStorage.
 function write_localStorage() {
-
-	//write saved regexes to memory.
-	myRegexArray.push(document.getElementById('newRegex').value);
-	localStorage["mySavedRegex"] = myRegexArray;
-	
-	//display it on the page after its wrote to memory.
+	ctOptions.push(document.getElementById('ctInput').value);
+	localStorage["ctOptions"] = ctOptions;
 	read_LocalStorage()
 }
 
 function read_LocalStorage(){
-	var readLocalStorage = localStorage['mySavedRegex'];
-	myRegexArray = readLocalStorage.split(',');
+	var readLocalStorage = localStorage['ctOptions'];
+	ctOptions = readLocalStorage.split(',');
 }
 
 function display_LocalStorage(){
 	var TempDivHolder
 	var displayLocation = document.getElementById('mdevDisplayedRegex');
 	displayLocation.innerHTML = '';
-	for(var i = 0; i < myRegexArray.length; i++){
+	for(var i = 0; i < ctOptions.length; i++){
 		console.log(i)
 		tempDivHolder = document.createElement("div");
 		tempDivHolder.id = 'myRegexDisplay' + i;
-		tempDivHolder.innerHTML = '<div><span><input type="checkbox" id="removeMe' + i +'"></span><span>' + myRegexArray[i] + '</span></div>';
+		tempDivHolder.innerHTML = '<div><span><input type="checkbox" id="removeMe' + i +'"></span><span>' + ctOptions[i] + '</span></div>';
 		displayLocation.appendChild(tempDivHolder);
 	}
-}
-
-//clear all local storage and display the page as empty.
-function clear_LocalStorage(){
-	localStorage.clear();
-	myRegexArray = [];
-		
-	var displayLocation = document.getElementById('mdevDisplayedRegex');
-	displayLocation.innerHTML = '<span>No Saved RegExs.</span>';
 }
 </script>
 
@@ -85,7 +77,7 @@ div[id*="myRegexDisplay"]:not(:last-of-type){
 		<span>No Saved RegExs.</span>
 	</div>
 	<div>
-		<input id="newRegex" type="text" name="regex">
+		<input id="ctInput" type="text" name="regex">
 	</div><input type="button" id="saveMyRegex" onClick="saveOptions()" value="Save"></div>
 </form>
 <input type="button" onclick="clear_LocalStorage()" value="Clear All">

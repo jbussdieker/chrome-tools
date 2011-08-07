@@ -1,0 +1,16 @@
+{
+  "name": "chrome-tools",
+  "version": "0.1",
+  "description": "<description>",
+  "permissions": ["tabs"],
+  "options_page": "options.html",
+  "browser_action": {
+      "default_title": "chrome-tools",
+      "default_icon": "icon.png"
+  },
+  "content_scripts" : [{ 
+		"matches" : [ "*://*/*" ],
+		"css": ["ctools.css"],
+		"js" : ["injector.js"]
+	  }]
+}

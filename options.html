@@ -1,0 +1,93 @@
+<html>
+<head>
+
+<script type="text/javascript">
+var myRegexArray = new Array();
+window.addEventListener("load", loadOptions, false);
+
+function saveOptions(){
+write_localStorage();
+loadOptions();
+document.getElementById('newRegex').value = '';
+}
+
+function loadOptions(){
+read_LocalStorage();
+display_LocalStorage();
+}
+
+// Saves options to localStorage.
+function write_localStorage() {
+
+	//write saved regexes to memory.
+	myRegexArray.push(document.getElementById('newRegex').value);
+	localStorage["mySavedRegex"] = myRegexArray;
+	
+	//display it on the page after its wrote to memory.
+	read_LocalStorage()
+}
+
+function read_LocalStorage(){
+	var readLocalStorage = localStorage['mySavedRegex'];
+	myRegexArray = readLocalStorage.split(',');
+}
+
+function display_LocalStorage(){
+	var TempDivHolder
+	var displayLocation = document.getElementById('mdevDisplayedRegex');
+	displayLocation.innerHTML = '';
+	for(var i = 0; i < myRegexArray.length; i++){
+		console.log(i)
+		tempDivHolder = document.createElement("div");
+		tempDivHolder.id = 'myRegexDisplay' + i;
+		tempDivHolder.innerHTML = '<div><span><input type="checkbox" id="removeMe' + i +'"></span><span>' + myRegexArray[i] + '</span></div>';
+		displayLocation.appendChild(tempDivHolder);
+	}
+}
+
+//clear all local storage and display the page as empty.
+function clear_LocalStorage(){
+	localStorage.clear();
+	myRegexArray = [];
+		
+	var displayLocation = document.getElementById('mdevDisplayedRegex');
+	displayLocation.innerHTML = '<span>No Saved RegExs.</span>';
+}
+</script>
+
+
+<style type="text/css">
+#mdevdisplayedregex {
+	background: #EEE;
+	padding: 10px;
+	border: 1px solid #DDD;
+	border-radius: 10px;
+	margin: 10px;
+}
+input{
+	display: inline-block;
+}
+input[type="checkbox"]{
+	margin-right: 5px;
+}
+div[id*="myRegexDisplay"]{
+	padding: 3px 0;
+}
+div[id*="myRegexDisplay"]:not(:last-of-type){
+	border-bottom: 1px dashed #ddd;
+}
+</style>
+</head>
+<body>
+<form>
+<div id="mdevMainWrap">
+	<div id="mdevDisplayedRegex">
+		<span>No Saved RegExs.</span>
+	</div>
+	<div>
+		<input id="newRegex" type="text" name="regex">
+	</div><input type="button" id="saveMyRegex" onClick="saveOptions()" value="Save"></div>
+</form>
+<input type="button" onclick="clear_LocalStorage()" value="Clear All">
+</body>
+</html>

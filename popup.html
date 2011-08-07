@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="base.css" type="text/css">
+<script type="text/javascript">
+function enable(){
+	//chrome.extension.sendRequest('', mdevOnSwitch(1), function responseCallback)
+}
+function disable(){
+	chrome.extension.sendRequest(mdevOnSwitch(0))
+}
+</script>
+</head>
+<body>
+<div id="clickME" class="buttonHolder">
+<div id="enabled" onclick="enable()" class="button">enable<div class="enabled"></div></div>
+<div id="disabled" onclick="disable()" class="button">disable<div class="disabled"></div></div></div>
+</body>
+</html>

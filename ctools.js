@@ -104,6 +104,7 @@ function ctoolsRemove() {
 
 function ctoolsRunXPathHighlight(xpath) {
   ctoolsShow3d();
+  xpath = xpath + " | " + xpath + "//*";
   var resultLinks = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
   var i=0;
   while ( (res = resultLinks.snapshotItem(i) ) !=null ) {

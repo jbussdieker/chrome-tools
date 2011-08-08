@@ -1,15 +1,17 @@
 var curButtonTop = 48;
-var domBackup = "";
+var domBackup = "<p>State error with the view</p>";
 var xpath = "//a";
 
-//ctoolsCreateButton("ctOptions", "Options", 'ctoolsShowOptions()');
-ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
-ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
-ctoolsCreateButton("ctRemoveXpath", "XPath Remove", 'ctoolsRemove()');
-//ctoolsShow3d();
-//ctoolsCreateTooltip();
-ctoolsCreateInput();
-domBackup = document.getElementsByTagName("html")[0].innerHTML;
+ctoolsGuiInit();
+
+function ctoolsGuiInit() {
+  //ctoolsCreateButton("ctOptions", "Options", 'ctoolsShowOptions()');
+  ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
+  ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
+  ctoolsCreateButton("ctRemoveXpath", "XPath Remove", 'ctoolsRemove()');
+  ctoolsCreateInput();
+  domBackup = document.getElementsByTagName("html")[0].innerHTML;
+}
 
 function ctoolsSetStandardElem(elem) {
 	elem.style.position = "fixed";
@@ -40,20 +42,6 @@ function ctoolsCreateInput() {
 	document.body.appendChild(elem);
 }
 
-// function ctoolsCreateTooltip() {
-//   // Create the button
-//  var elem = document.createElement("div");
-//   ctoolsSetStandardElem(elem);
-//  elem.id = 'ctTooltip';
-//  elem.style.top = "8px";
-//  elem.style.left = "8px";
-//  elem.style.height = "16px";
-//  elem.style.width = "80%";
-//  elem.style.fontSize = "16px";
-//  elem.innerHTML = "Test";
-//  document.body.appendChild(elem);
-// }
-
 function ctoolsCreateButton(id, caption, func) {
   // Create the button
 	var elem = document.createElement("div");
@@ -68,20 +56,6 @@ function ctoolsCreateButton(id, caption, func) {
 	elem.innerHTML = caption;
 	document.body.appendChild(elem);
 }
-
-// function ctoolsShowOptions() {
-//   var elem = document.createElement("div");
-//   elem.id = "ctOptionsWindow";
-//   elem.style.top = "8px";
-//   elem.style.left = "8px";
-//  elem.style.height = "320px";
-//  elem.style.width = "320px";
-//   elem.style.position = "fixed";
-//   elem.style.zIndex = "999999";
-//   elem.style.backgroundColor = "gray";
-//   elem.style.border = "1px solid black";
-//   document.body.appendChild(elem);
-// }
 
 function ctoolsShowOriginal() {
   // Restore the original page content
@@ -110,6 +84,7 @@ function ctoolsRunXPathHighlight(xpath) {
   while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
     if (res.getAttribute("class") != "ct_button")
       res.style.backgroundColor = "red";
+      // Zordering feature (Doesn't work well)
       // var parent = res.parentNode;
       // while (parent != document.body) {
       //   parent.style.position = "relative";
@@ -165,9 +140,6 @@ function ctoolsElemMouseOver(e) {
 
   // Highlight
 	this.style.backgroundColor = "green";
-
-  // 
-	//e.stopPropagation();
 }
 
 function ctoolsElemClick(e) {

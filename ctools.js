@@ -17,6 +17,9 @@ function ctoolsSetStandardElem(elem) {
 	elem.style.padding = "4px";
 	elem.style.border = "1px solid black";
 	elem.style.backgroundColor = "gray";
+	elem.style.fontFamily = "helvetica";
+	elem.style.fontSize = "12pt";
+	elem.style.color = "black";
 	elem.setAttribute('class', 'ct_button');
 }
 
@@ -33,6 +36,7 @@ function ctoolsCreateInput() {
 	elem.setAttribute("type", "text");
 	elem.innerHTML = "Test";
 	elem.addEventListener("click", function() { locked = false;});
+	elem.addEventListener("change", function() { ctoolsRunXPathHighlight(this.value);});
 	document.body.appendChild(elem);
 }
 
@@ -99,10 +103,12 @@ function ctoolsRemove() {
 }
 
 function ctoolsRunXPathHighlight(xpath) {
+  ctoolsShow3d();
   var resultLinks = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
   var i=0;
-  while ( (res = resultLinks.snapshotItem(i) ) !=null ){
-    res.style.backgroundColor = "red";
+  while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
+    if (res.getAttribute("class") != "ct_button")
+      res.style.backgroundColor = "red";
     i++
   }
 }

@@ -224,12 +224,13 @@ function ctoolsShow3d() {
       elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
       elm.addEventListener("mousedown", ctoolsElemClick, false);
 //      elems[elem].style.border = "1px solid white";
+      elm.style.border = "none";
       elm.style.zIndex = lvl;
 //      elm.style.position = "relative";
       elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";
       elm.style.overflow = "visible";
-//      elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
-      elm.style.boxShadow = "-1px -1px 5px rgba(0,0,0,0.5)";
+      elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
+      elm.style.boxShadow = "-3px -3px 6px rgba(0,0,0,0.5)";
     }
   }
 }

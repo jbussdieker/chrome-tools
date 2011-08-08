@@ -173,7 +173,6 @@ function ctoolsElemClick(e) {
   ttelem.value = xpath;
   ctoolsRunXPathHighlight(xpath);
 	e.stopPropagation();
-	e.cancel();
 }
 
 function ctoolsShow3d() {

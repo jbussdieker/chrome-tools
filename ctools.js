@@ -1,11 +1,10 @@
 var curButtonTop = 48;
-var domBackup = "<p>State error with the view</p>";
+var domBackup = "";
 var xpath = "//a";
 var winProxy;
 ctoolsGuiInit();
 
 function ctoolsGuiInit() {
-  //ctoolsCreateButton("ctOptions", "Options", 'ctoolsShowOptions()');
   ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
   ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
   ctoolsCreateButton("ctRemoveXpath", "Remove", 'ctoolsRemove()');
@@ -14,16 +13,6 @@ function ctoolsGuiInit() {
 }
 
 function ctoolsSetStandardElem(elem) {
-	elem.style.position = "fixed";
-	elem.style.zIndex = "999999999";
-	elem.style.padding = "4px";
-	elem.style.border = "1px solid black";
-	elem.style.backgroundColor = "gray";
-	elem.style.fontFamily = "helvetica";
-	elem.style.fontSize = "12pt";
-	elem.style.color = "black";
-	elem.style.boxSizing = "content-box";
-	elem.style.borderRadius = "4px";
 	elem.setAttribute('class', 'ct_button');
 	elem.setAttribute('ctools_save', 'true');
 }
@@ -36,7 +25,7 @@ function ctoolsCreateInput() {
 	elem.style.top = "8px";
 	elem.style.left = "8px";
 	elem.style.height = "16px";
-	elem.style.width = "80%";
+	elem.style.width = "75%";
 	elem.style.fontSize = "16px";
 	elem.setAttribute("type", "text");
 	elem.innerHTML = "Test";
@@ -49,25 +38,35 @@ function ctoolsCreateButton(id, caption, func) {
   // Create the button
 	var elem = document.createElement("div");
   ctoolsSetStandardElem(elem);
+
+  // Custom attributes
 	elem.setAttribute('onclick',func);
 	elem.style.top = curButtonTop + "px";
-	curButtonTop += 32;
 	elem.id = id;
 	elem.style.right = "8px";
 	elem.style.height = "16px";
 	elem.style.width = "128px";
 	elem.innerHTML = caption;
+
+  // Increase button create top point
+	curButtonTop += 32;
+
+  // Add to doc
 	document.body.appendChild(elem);
 }
 
 function ctoolsNewWindow() {
-  destxpath = prompt("Enter XPath", xpath);
+  // Prompt for destination xpath
+  //destxpath = prompt("Enter XPath", xpath);
+  
+  // Create a new window if we don't already have one
   if (!winProxy)
     winProxy = window.open();
+  
+  // Toggle off 3d mode to preserve copy elements
   ctoolsShowOriginal();
-//	var elem = winProxy.document.createElement("div");
-//	elem.innerHTML = "Testing";
-//  winProxy.document.body.appendChild(elem);
+
+  // Execute xpath copy to new window body
   var resultLinks = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
   var i=0;
   while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
@@ -76,6 +75,8 @@ function ctoolsNewWindow() {
       i++;
     }
   }
+  
+  // Restore 3d mode
   ctoolsShow3d();
 }
 
@@ -175,66 +176,59 @@ function ctoolsElemClick(e) {
 	e.stopPropagation();
 }
 
+function ctoolsGetAncestorCount(elem) {
+  var lvl = 0;
+  while (elem != document.body) {
+    elem = elem.parentNode;
+    lvl++;
+  }
+  return lvl;
+}
+
 function ctoolsShow3d() {
+  // Only backup the DOM once so we don't accidentally save something we don't want
+  if (domBackup == "")
     domBackup = document.getElementsByTagName("html")[0].innerHTML;
 
   // Toggle view button state
   document.getElementById("ctView").innerHTML = "3D View";
   document.getElementById("ctView").setAttribute("onclick", "ctoolsShowOriginal()");
 
-  
+  // Calculate a few metrics about the node data
   elems = document.body.getElementsByTagName("*");
-  document.body.style.background = "rgb(0,0,0)";
   var maxlvl = 0.0;
   for (elem in elems) {
     if (elems[elem].style) {
-      var lvl = 0.0;
       elm = elems[elem];
-      while (elm != document.body) {
-        elm = elm.parentNode;
-        lvl++;
-        if (lvl > maxlvl) {
-          maxlvl = lvl;
-        }
+      var lvl = ctoolsGetAncestorCount(elm);
+      if (lvl > maxlvl) {
+        maxlvl = lvl;
       }
     }
   }
-  console.log("MaxLVL: " + maxlvl);
+  
+  // Calculate a few scales
   var colorScale = parseInt(255.0/maxlvl);
   var sizeScale = parseFloat(0.15/maxlvl);
-  console.log("Other: " + colorScale);
+
+  // Transform
+  document.body.style.background = "rgb(0,0,0)";
   for (elem in elems) {
     if (elems[elem].style && (elems[elem].getAttribute("ctools_save") != "true")) {
-      var lvl = 0.0;
       elm = elems[elem];
-      while (elm != document.body) {
-        elm = elm.parentNode;
-        lvl++;
-      }
-      elm = elems[elem];
-
+      var lvl = ctoolsGetAncestorCount(elm);
       elm.style.webkitTransform = "scale(" + ((maxlvl-lvl) * sizeScale + 0.85) + ")";
 //      elm.style.webkitTransform += " translate(" + (lvl * ((maxlvl-lvl) * sizeScale + 0.1)) + "px, " + (lvl * (maxlvl-lvl) * sizeScale) + "px)";
-      
       // Kill images?
-      //elm.setAttribute("src", "");
-      
+//      elm.setAttribute("src", "");
       elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
       elm.addEventListener("mousedown", ctoolsElemClick, false);
-      //elems[elem].style.border = "1px solid white";
+//      elems[elem].style.border = "1px solid white";
       elm.style.zIndex = lvl;
-      //elm.style.position = "relative";
-      
-      //if (elems[elem].style.background == "") {
-        elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";
-        //elm.style.backgroundImage = "";
-        // if (lvl == 10) {
-        //   elm.style.backgroundColor = "green";
-        // }
-        //elm.style.backgroundColor = "rgb(" + lvl * (7) + "," + lvl * (7) + "," + lvl * (7) + ")";
-      //}
+//      elm.style.position = "relative";
+      elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";
       elm.style.overflow = "visible";
-      //elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
+//      elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
       elm.style.boxShadow = "-1px -1px 5px rgba(0,0,0,0.5)";
     }
   }

@@ -1,4 +1,4 @@
-var curButtonTop = 8;
+var curButtonTop = 48;
 var domBackup = "";
 var xpath = "//a";
 
@@ -110,6 +110,12 @@ function ctoolsRunXPathHighlight(xpath) {
   while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
     if (res.getAttribute("class") != "ct_button")
       res.style.backgroundColor = "red";
+      // var parent = res.parentNode;
+      // while (parent != document.body) {
+      //   parent.style.position = "relative";
+      //   parent.style.zIndex = "999999";
+      //   parent = parent.parentNode;
+      // }
     i++
   }
 }
@@ -199,7 +205,7 @@ function ctoolsShow3d() {
   }
   console.log("MaxLVL: " + maxlvl);
   var colorScale = parseInt(255.0/maxlvl);
-  var sizeScale = parseFloat(0.1/maxlvl);
+  var sizeScale = parseFloat(0.15/maxlvl);
   console.log("Other: " + colorScale);
   for (elem in elems) {
     if (elems[elem].style && (elems[elem].getAttribute("class") != "ct_button")) {
@@ -211,17 +217,18 @@ function ctoolsShow3d() {
       }
       elm = elems[elem];
 
-      elm.style.webkitTransform = "translate(" + (lvl) + "px, " + (lvl) + "px)";
-      elm.style.webkitTransform += " scale(" + ((maxlvl-lvl) * sizeScale + 0.9) + ")";
+      elm.style.webkitTransform = "scale(" + ((maxlvl-lvl) * sizeScale + 0.85) + ")";
+//      elm.style.webkitTransform += " translate(" + (lvl * ((maxlvl-lvl) * sizeScale + 0.1)) + "px, " + (lvl * (maxlvl-lvl) * sizeScale) + "px)";
       
       // Kill images?
-      elm.setAttribute("src", "");
+      //elm.setAttribute("src", "");
       
       elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
       elm.addEventListener("mousedown", ctoolsElemClick, false);
       //elems[elem].style.border = "1px solid white";
-      //elems[elem].style.zIndex = maxlvl - lvl;
-      //elems[elem].style.position = "relative";
+      elm.style.zIndex = lvl;
+      //elm.style.position = "relative";
+      
       //if (elems[elem].style.background == "") {
         elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";
         //elm.style.backgroundImage = "";
@@ -232,7 +239,7 @@ function ctoolsShow3d() {
       //}
       elm.style.overflow = "visible";
       //elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
-      elems[elem].style.boxShadow = "-1px -1px 5px rgba(0,0,0,0.5)";
+      elm.style.boxShadow = "-1px -1px 5px rgba(0,0,0,0.5)";
     }
   }
 }

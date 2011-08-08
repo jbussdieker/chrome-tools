@@ -1,16 +1,16 @@
 var curButtonTop = 48;
 var domBackup = "<p>State error with the view</p>";
 var xpath = "//a";
-
+var winProxy;
 ctoolsGuiInit();
 
 function ctoolsGuiInit() {
   //ctoolsCreateButton("ctOptions", "Options", 'ctoolsShowOptions()');
   ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
   ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
-  ctoolsCreateButton("ctRemoveXpath", "XPath Remove", 'ctoolsRemove()');
+  ctoolsCreateButton("ctRemoveXpath", "Remove", 'ctoolsRemove()');
+  ctoolsCreateButton("ctNewWindow", "Move To", 'ctoolsNewWindow()');
   ctoolsCreateInput();
-  domBackup = document.getElementsByTagName("html")[0].innerHTML;
 }
 
 function ctoolsSetStandardElem(elem) {
@@ -22,7 +22,10 @@ function ctoolsSetStandardElem(elem) {
 	elem.style.fontFamily = "helvetica";
 	elem.style.fontSize = "12pt";
 	elem.style.color = "black";
+	elem.style.boxSizing = "content-box";
+	elem.style.borderRadius = "4px";
 	elem.setAttribute('class', 'ct_button');
+	elem.setAttribute('ctools_save', 'true');
 }
 
 function ctoolsCreateInput() {
@@ -55,6 +58,25 @@ function ctoolsCreateButton(id, caption, func) {
 	elem.style.width = "128px";
 	elem.innerHTML = caption;
 	document.body.appendChild(elem);
+}
+
+function ctoolsNewWindow() {
+  destxpath = prompt("Enter XPath", xpath);
+  if (!winProxy)
+    winProxy = window.open();
+  ctoolsShowOriginal();
+//	var elem = winProxy.document.createElement("div");
+//	elem.innerHTML = "Testing";
+//  winProxy.document.body.appendChild(elem);
+  var resultLinks = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
+  var i=0;
+  while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
+    if (res.getAttribute("class") != "ct_button") {
+      winProxy.document.body.appendChild(res);
+      i++;
+    }
+  }
+  ctoolsShow3d();
 }
 
 function ctoolsShowOriginal() {
@@ -154,6 +176,8 @@ function ctoolsElemClick(e) {
 }
 
 function ctoolsShow3d() {
+    domBackup = document.getElementsByTagName("html")[0].innerHTML;
+
   // Toggle view button state
   document.getElementById("ctView").innerHTML = "3D View";
   document.getElementById("ctView").setAttribute("onclick", "ctoolsShowOriginal()");
@@ -180,7 +204,7 @@ function ctoolsShow3d() {
   var sizeScale = parseFloat(0.15/maxlvl);
   console.log("Other: " + colorScale);
   for (elem in elems) {
-    if (elems[elem].style && (elems[elem].getAttribute("class") != "ct_button")) {
+    if (elems[elem].style && (elems[elem].getAttribute("ctools_save") != "true")) {
       var lvl = 0.0;
       elm = elems[elem];
       while (elm != document.body) {

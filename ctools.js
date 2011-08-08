@@ -158,10 +158,12 @@ function ctoolsElemMouseOver(e) {
 }
 
 function ctoolsElemClick(e) {
+  var ttelem = document.getElementById("ctInput");
   this.href='javascript:void(0)';
   ctoolsShow3d();
   locked = true;
   xpath = ctoolsCalcXPath(this);
+  ttelem.value = xpath;
   ctoolsRunXPathHighlight(xpath);
 	e.stopPropagation();
 	e.cancel();

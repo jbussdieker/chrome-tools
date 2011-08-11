@@ -5,54 +5,56 @@ var winProxy;
 ctoolsGuiInit();
 
 function ctoolsGuiInit() {
+  document.body.addEventListener("DOMSubtreeModified", ctoolsOnDomChange);
   ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
   ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
   ctoolsCreateButton("ctRemoveXpath", "Remove", 'ctoolsRemove()');
   ctoolsCreateButton("ctNewWindow", "Move To", 'ctoolsNewWindow()');
+  ctoolsCreateButton("ctShowJS", "Show JS", 'ctoolsShowJS()');
   ctoolsCreateInput();
 }
 
 function ctoolsSetStandardElem(elem) {
-	elem.setAttribute('class', 'ct_button');
-	elem.setAttribute('ctools_save', 'true');
+  elem.setAttribute('class', 'ct_button');
+  elem.setAttribute('ctools_save', 'true');
 }
 
 function ctoolsCreateInput() {
   // Create the button
-	var elem = document.createElement("input");
+  var elem = document.createElement("input");
   ctoolsSetStandardElem(elem);
-	elem.id = 'ctInput';
-	elem.style.top = "8px";
-	elem.style.left = "8px";
-	elem.style.height = "16px";
-	elem.style.width = "75%";
-	elem.style.fontSize = "16px";
-	elem.setAttribute("type", "text");
-	elem.innerHTML = "Test";
-	elem.addEventListener("click", function() { locked = false;});
-	elem.addEventListener("change", function() { ctoolsRunXPathHighlight(this.value);});
-	document.body.appendChild(elem);
+  elem.id = 'ctInput';
+  elem.style.top = "8px";
+  elem.style.left = "8px";
+  elem.style.height = "16px";
+  elem.style.width = "50%";
+  elem.style.fontSize = "16px";
+  elem.setAttribute("type", "text");
+  elem.innerHTML = "Test";
+  elem.addEventListener("click", function() { locked = false;});
+  elem.addEventListener("change", function() { ctoolsRunXPathHighlight(this.value);});
+  document.body.appendChild(elem);
 }
 
 function ctoolsCreateButton(id, caption, func) {
   // Create the button
-	var elem = document.createElement("div");
+  var elem = document.createElement("div");
   ctoolsSetStandardElem(elem);
 
   // Custom attributes
-	elem.setAttribute('onclick',func);
-	elem.style.top = curButtonTop + "px";
-	elem.id = id;
-	elem.style.right = "8px";
-	elem.style.height = "16px";
-	elem.style.width = "128px";
-	elem.innerHTML = caption;
+  elem.setAttribute('onclick',func);
+  elem.style.top = curButtonTop + "px";
+  elem.id = id;
+  elem.style.right = "8px";
+  elem.style.height = "16px";
+  elem.style.width = "128px";
+  elem.innerHTML = caption;
 
   // Increase button create top point
-	curButtonTop += 32;
-
+  curButtonTop += 32;
+  
   // Add to doc
-	document.body.appendChild(elem);
+  document.body.appendChild(elem);
 }
 
 function ctoolsNewWindow() {
@@ -106,7 +108,7 @@ function ctoolsRunXPathHighlight(xpath) {
   var i=0;
   while ( (res = resultLinks.snapshotItem(i) ) !=null ) {
     if (res.getAttribute("class") != "ct_button")
-      res.style.backgroundColor = "red";
+      res.style.backgroundColor = "yellow";
       // Zordering feature (Doesn't work well)
       // var parent = res.parentNode;
       // while (parent != document.body) {
@@ -162,7 +164,37 @@ function ctoolsElemMouseOver(e) {
   }
 
   // Highlight
-	this.style.backgroundColor = "green";
+  this.style.backgroundColor = "green";
+}
+
+function ctoolsHasEventHandler(elem) {
+  if (elem.onblur != null)
+    return true;
+  if (elem.onclick != null)
+    return true;
+  if (elem.ondblclick != null)
+    return true;
+  if (elem.onfocus != null)
+    return true;
+  if (elem.onkeydown != null)
+    return true;
+  if (elem.onkeypress != null)
+    return true;
+  if (elem.onkeyup != null)
+    return true;
+  if (elem.onmousedown != null)
+    return true;
+  if (elem.onmousemove != null)
+    return true;
+  if (elem.onmouseout != null)
+    return true;
+  if (elem.onmouseover != null)
+    return true;
+  if (elem.onmouseup != null)
+    return true;
+  if (elem.onresize != null)
+    return true;
+  return false;
 }
 
 function ctoolsElemClick(e) {
@@ -173,7 +205,7 @@ function ctoolsElemClick(e) {
   xpath = ctoolsCalcXPath(this);
   ttelem.value = xpath;
   ctoolsRunXPathHighlight(xpath);
-	e.stopPropagation();
+  e.stopPropagation();
 }
 
 function ctoolsGetAncestorCount(elem) {
@@ -185,7 +217,51 @@ function ctoolsGetAncestorCount(elem) {
   return lvl;
 }
 
+function ctoolsMakeScopeOpaque(elem) {
+  while (elem != document.body) {
+    elem.style.opacity = 1.0;
+    elem = elem.parentNode;
+  }
+}
+
+function ctoolsOnDomChange(e) {
+  //console.log(e);
+  // Mark this element as having been touched up by JS
+  e.target.setAttribute("ctools_touched", "true")
+  //e.target.style.background = "blue";
+}
+
+function ctoolsShowJS() {
+  document.body.removeEventListener("DOMSubtreeModified", ctoolsOnDomChange);
+  // Only backup the DOM once so we don't accidentally save something we don't want
+  if (domBackup == "")
+    domBackup = document.getElementsByTagName("html")[0].innerHTML;
+
+  // Transform
+  elems = document.body.getElementsByTagName("*");
+  for (elem in elems) {
+    if (elems[elem].style && (elems[elem].getAttribute("ctools_save") != "true")) {
+      elm = elems[elem];
+      var lvl = ctoolsGetAncestorCount(elm);
+
+      if (ctoolsHasEventHandler(elm) == true) {
+        elm.style.background = "magenta";
+        elm.style.opacity = 1.0;
+        ctoolsMakeScopeOpaque(elm);
+      }
+      
+      if (elm.getAttribute("ctools_touched") == "true") {
+        elm.style.background = "blue";
+      }
+
+      elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
+      elm.addEventListener("mousedown", ctoolsElemClick, false);      
+    }
+  }
+}
+
 function ctoolsShow3d() {
+  document.body.removeEventListener("DOMSubtreeModified", ctoolsOnDomChange);
   // Only backup the DOM once so we don't accidentally save something we don't want
   if (domBackup == "")
     domBackup = document.getElementsByTagName("html")[0].innerHTML;
@@ -220,17 +296,31 @@ function ctoolsShow3d() {
       elm.style.webkitTransform = "scale(" + ((maxlvl-lvl) * sizeScale + 0.85) + ")";
 //      elm.style.webkitTransform += " translate(" + (lvl * ((maxlvl-lvl) * sizeScale + 0.1)) + "px, " + (lvl * (maxlvl-lvl) * sizeScale) + "px)";
       // Kill images?
-//      elm.setAttribute("src", "");
-      elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
-      elm.addEventListener("mousedown", ctoolsElemClick, false);
+      elm.setAttribute("src", "");
 //      elems[elem].style.border = "1px solid white";
       elm.style.border = "none";
       elm.style.zIndex = lvl;
 //      elm.style.position = "relative";
-      elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";
+
       elm.style.overflow = "visible";
-      elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
       elm.style.boxShadow = "-3px -3px 6px rgba(0,0,0,0.5)";
+
+      if (ctoolsHasEventHandler(elm) == true) {
+        elm.style.background = "magenta";
+        elm.style.opacity = 1.0;
+        ctoolsMakeScopeOpaque(elm);
+      }
+      else {
+        elm.style.opacity = 1.0 - ((0.25 / maxlvl) * lvl); //"1.0";
+        elm.style.background = "rgb(" + lvl * colorScale + "," + lvl * colorScale + "," + lvl * colorScale + ")";        
+      }
+      
+      if (elm.getAttribute("ctools_touched") == "true") {
+        elm.style.background = "blue";
+      }
+
+      elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
+      elm.addEventListener("mousedown", ctoolsElemClick, false);      
     }
   }
 }

@@ -4,13 +4,13 @@ document.body.addEventListener('onLoad', ctoolsInit());
 // Entry point for extension
 function ctoolsInit() {
   // AJAX call for the page so we're working with the same DOM tritium would see
-  ctoolsGrabRemoteHTML();
+  //ctoolsGrabRemoteHTML();
   
   // Attach the GUI script
-	var elem = document.createElement("script");
-	elem.setAttribute("type", "text/javascript");
-	elem.setAttribute("src", chrome.extension.getURL("ctools.js"));
-	document.body.appendChild(elem);
+  var elem = document.createElement("script");
+  elem.setAttribute("type", "text/javascript");
+  elem.setAttribute("src", chrome.extension.getURL("ctools.js"));
+  document.body.appendChild(elem);
 }
 
 // Simply GET the current page we're at

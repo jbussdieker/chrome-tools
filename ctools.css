@@ -4,6 +4,7 @@
   position: fixed;
   color: black;
   font-size: 12pt;
+  -webkit-box-sizing: content-box;
   box-sizing: content-box;
   border-radius: 4px;
   font-family: helvetica;

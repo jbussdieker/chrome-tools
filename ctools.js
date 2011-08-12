@@ -5,6 +5,7 @@ var winProxy;
 var wTooltip;
 
 ctoolsGuiInit();
+overloadInit();
 
 function ctoolsCreateWindow() {
   var elem = document.createElement("div");
@@ -396,3 +397,42 @@ function ctoolsShow3d() {
     }
   }
 }
+
+function _overloadMethod(targetMethod, callback, capture) {
+	return function(data) {
+    var args = [].slice.call(arguments);
+    if(capture) {
+      var trace = "";
+      try {
+        module.dummyFunctionThatDoesNotExist();
+      } catch(e) {
+        trace = e.stack.toString();
+      }
+      var gid = module.generateGlobalId(type);
+      var modifiedArgs = handler(arguments.callee, trace, args.join(" | "), type, gid);
+      args = modifiedArgs ? modifiedArgs.split(" | ") : args;
+    }
+    var retVal = target.origPtr.apply(this, args);
+
+    if(callback) {
+      callback();
+    }
+    return retVal;
+  };
+}
+
+
+
+function overloadNodeNavigation() {
+	/*
+	http://www.w3schools.com/Dom/dom_nodes_navigate.asp
+	* parentNode
+	* firstChild
+	* lastChild
+	* childNodes
+	* nextSibling
+	* previousSibling
+	*/
+}
+
+

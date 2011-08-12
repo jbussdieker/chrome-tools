@@ -2,25 +2,53 @@ var curButtonTop = 48;
 var domBackup = "";
 var xpath = "//a";
 var winProxy;
+var wTooltip;
+
 ctoolsGuiInit();
 
+function ctoolsCreateWindow() {
+  var elem = document.createElement("div");
+  ctoolsSetStandardElem(elem);
+  elem.style.top = "100px";
+  elem.style.left = "100px";
+  elem.style.width = "200px";
+  elem.style.height = "200px";
+  elem.style.display = "none";
+  elem.innerHTML = "Test";
+  elem.show = function () { alert("test"); };
+  document.body.appendChild(elem);
+
+  return elem;
+}
+
 function ctoolsGuiInit() {
+  console.log("ctoolsGuiInit: Loading extension into live webpage")
+
+  // Start listening for DOM events
   document.body.addEventListener("DOMSubtreeModified", ctoolsOnDomChange);
+
+  // Create the menu (Might be time to make this it's own function)
   ctoolsCreateButton("ctView", "Normal View", 'ctoolsShow3d()');
   ctoolsCreateButton("ctRunXpath", "XPath Highlight", 'ctoolsRunXPath()');
   ctoolsCreateButton("ctRemoveXpath", "Remove", 'ctoolsRemove()');
   ctoolsCreateButton("ctNewWindow", "Move To", 'ctoolsNewWindow()');
   ctoolsCreateButton("ctShowJS", "Show JS", 'ctoolsShowJS()');
+
+  // Create the XPATH input[type='text'] element
   ctoolsCreateInput();
+  
+  // Create a window
+  //wTooltip = ctoolsCreateWindow();
+  //wTooltip.show();
 }
 
 function ctoolsSetStandardElem(elem) {
+  // Set a few attributes so the engine know these belong to us
   elem.setAttribute('class', 'ct_button');
   elem.setAttribute('ctools_save', 'true');
 }
 
 function ctoolsCreateInput() {
-  // Create the button
   var elem = document.createElement("input");
   ctoolsSetStandardElem(elem);
   elem.id = 'ctInput';
@@ -30,7 +58,6 @@ function ctoolsCreateInput() {
   elem.style.width = "50%";
   elem.style.fontSize = "16px";
   elem.setAttribute("type", "text");
-  elem.innerHTML = "Test";
   elem.addEventListener("click", function() { locked = false;});
   elem.addEventListener("change", function() { ctoolsRunXPathHighlight(this.value);});
   document.body.appendChild(elem);
@@ -93,6 +120,7 @@ function ctoolsShowOriginal() {
 
 function ctoolsRemove() {
   xpath = prompt("Enter XPath", xpath);
+
   var resultLinks = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
   var i=0;
   while ( (res = resultLinks.snapshotItem(i) ) !=null ){
@@ -120,11 +148,13 @@ function ctoolsRunXPathHighlight(xpath) {
   }
 }
 
+// Menu event handler
 function ctoolsRunXPath() {
   xpath = prompt("Enter XPath", xpath);
   ctoolsRunXPathHighlight(xpath);
 }
 
+// Build XPATH selector for a given HTML element
 function ctoolsCalcXPath(elem) {
   var xpath = "";
   var curelem = elem;

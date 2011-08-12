@@ -11,12 +11,19 @@ function ctoolsCreateWindow() {
   ctoolsSetStandardElem(elem);
   elem.style.top = "100px";
   elem.style.left = "100px";
-  elem.style.width = "200px";
-  elem.style.height = "200px";
+  //elem.style.width = "200px";
+  //elem.style.height = "32px";
   elem.style.display = "none";
   elem.innerHTML = "Test";
   elem.show = function () { alert("test"); };
   document.body.appendChild(elem);
+
+  // Can we use just innerHTML?
+  //var lbl1 = document.createElement("div");
+  //lbl1.innerHTML = "Test 3";
+  //elem.appendChild(lbl1);
+
+  elem.addEventListener("mousemove", ctoolsElemMouseMove, true);
 
   return elem;
 }
@@ -38,8 +45,7 @@ function ctoolsGuiInit() {
   ctoolsCreateInput();
   
   // Create a window
-  //wTooltip = ctoolsCreateWindow();
-  //wTooltip.show();
+  wTooltip = ctoolsCreateWindow();
 }
 
 function ctoolsSetStandardElem(elem) {
@@ -172,6 +178,13 @@ function ctoolsCalcXPath(elem) {
   return "/html/" + xpath;
 }
 
+function ctoolsElemMouseMove(e) {
+  wTooltip.style.display = "block";
+  wTooltip.style.postion = "absolute";
+  wTooltip.style.top = e.clientY + "px";
+  wTooltip.style.left = e.clientX + "px";
+}
+
 var lastelem;
 var bgcolor;
 var locked = false;
@@ -187,6 +200,7 @@ function ctoolsElemMouseOver(e) {
   lastelem = this;
   bgcolor = this.style.backgroundColor;
 
+  wTooltip.innerHTML = ctoolsCalcXPath(this);
   if (locked == false)
   {
     ttelem.value = ctoolsCalcXPath(this);
@@ -351,6 +365,8 @@ function ctoolsShow3d() {
 
       elm.addEventListener("mouseover", ctoolsElemMouseOver, true);
       elm.addEventListener("mousedown", ctoolsElemClick, false);      
+
+      elm.addEventListener("mousemove", ctoolsElemMouseMove, true);
     }
   }
 }

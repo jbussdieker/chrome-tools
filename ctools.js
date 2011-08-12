@@ -9,8 +9,10 @@ ctoolsGuiInit();
 function ctoolsCreateWindow() {
   var elem = document.createElement("div");
   ctoolsSetStandardElem(elem);
+  elem.id = "ctTooltip";
   elem.style.top = "100px";
   elem.style.left = "100px";
+  elem.style.textAlign = "left";
   //elem.style.width = "200px";
   //elem.style.height = "32px";
   elem.style.display = "none";
@@ -160,6 +162,24 @@ function ctoolsRunXPath() {
   ctoolsRunXPathHighlight(xpath);
 }
 
+function ctoolsCalcShortXpath(elem) {
+  var xpath = "";
+  var curelem = elem;
+  while (curelem.tagName != "HTML") {
+    var tagname = curelem.tagName.toLowerCase();
+    if (curelem.id != "")
+      tagname = tagname + "[@id='" + curelem.id + "']";
+    if (xpath != "")
+      xpath = tagname + "/" + xpath;
+    else
+      xpath = tagname;
+    if (curelem.id != "")
+      break;    
+    curelem = curelem.parentNode;
+  }
+  return "//" + xpath;  
+}
+
 // Build XPATH selector for a given HTML element
 function ctoolsCalcXPath(elem) {
   var xpath = "";
@@ -179,10 +199,10 @@ function ctoolsCalcXPath(elem) {
 }
 
 function ctoolsElemMouseMove(e) {
-  wTooltip.style.display = "block";
-  wTooltip.style.postion = "absolute";
-  wTooltip.style.top = e.clientY + "px";
-  wTooltip.style.left = e.clientX + "px";
+  document.getElementById("ctTooltip").style.display = "block";
+  document.getElementById("ctTooltip").style.postion = "absolute";
+  document.getElementById("ctTooltip").style.top = e.clientY + 5 + "px";
+  document.getElementById("ctTooltip").style.left = e.clientX + 5 + "px";
 }
 
 var lastelem;
@@ -200,7 +220,13 @@ function ctoolsElemMouseOver(e) {
   lastelem = this;
   bgcolor = this.style.backgroundColor;
 
-  wTooltip.innerHTML = ctoolsCalcXPath(this);
+  var strTooltip = ctoolsCalcShortXpath(this) + "<br>" + this.tagName;
+  if (this.id)
+    strTooltip = strTooltip + "<br>@id='" + this.id + "'";
+  if (this.classList.length > 0)
+    strTooltip = strTooltip + "<br>@class='" + this.classList.toString() + "'";
+  
+  document.getElementById("ctTooltip").innerHTML = strTooltip;
   if (locked == false)
   {
     ttelem.value = ctoolsCalcXPath(this);
